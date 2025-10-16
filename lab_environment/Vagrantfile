@@ -51,10 +51,10 @@ Vagrant.configure("2") do |config|
 
   $script = <<-SHELL
       getent passwd deploy || useradd --comment "deploy" --home-dir /home/deploy --create-home deploy
-      printf "%%deploy ALL=(ALL) NOPASSWD: ALL\n" > /etc/sudoers.d/deploy
+      printf "%deploy ALL=(ALL) NOPASSWD: ALL\n" > /etc/sudoers.d/deploy
       umask 077
       mkdir --parents /home/deploy/.ssh
-      printf "#{public_key}" > /home/deploy/.ssh/authorized_keys
+      printf "#{public_key}\n" > /home/deploy/.ssh/authorized_keys
       chown --recursive deploy:deploy ~deploy
       ip -c a s eth0
     SHELL
@@ -62,7 +62,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "webserver" do |webserver|
     webserver.vm.hostname = "webserver"
     webserver.vm.provision "shell", inline: $script
-    webserver.vm.post_up_message = "To access this VM, do 'ssh -l deploy -i deploy_key [hostname/IP]"
+    webserver.vm.post_up_message = "To access this VM, do 'ssh -l deploy -i deploy_key.pub [hostname/IP]"
     webserver.vm.synced_folder ".", "/vagrant",
       type: "nfs",
       nfs_version: 4,
@@ -72,7 +72,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "dbserver" do |dbserver|
     dbserver.vm.hostname = "dbserver"
     dbserver.vm.provision "shell", inline: $script
-    dbserver.vm.post_up_message = "To access this VM, do 'ssh -l deploy -i deploy_key [hostname/IP]"
+    dbserver.vm.post_up_message = "To access this VM, do 'ssh -l deploy -i deploy_key.pub [hostname/IP]"
     dbserver.vm.synced_folder ".", "/vagrant",
       type: "nfs",
       nfs_version: 4,

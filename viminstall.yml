@@ -1,0 +1,12 @@
+---
+- name: Install Vim on remote machines
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Install Vim
+      apt:
+        name: vim
+        state: present
+        update_cache: yes
+

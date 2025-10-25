@@ -1,0 +1,7 @@
+---
+- name: just the facts, please
+  hosts: 192.168.121.32
+  tasks:
+    - name: Output facts
+      ansible.builtin.debug:
+        var: ansible_facts

@@ -111,10 +111,12 @@ incompatibilities.
 ## QUESTION A
 
 What happens if you run `ansible-inventory --list` in the directory you created above?
+A:You get the inventory written out in json format with all its variabels and groups.
 
 ## QUESTION B
 
 What happens if you run `ansible-inventory --graph` in the directory you created above?
+A: It prints out a very minimalist graph/tree of the inventory.
 
 ## QUESTION C
 
@@ -131,6 +133,9 @@ Now run:
 Study the output of this command.
 
 What does the `ansible_connection=local` part mean?
+A: If i understand corectly we define a group called "Controller" as in a hostgroup since its inside the host file.
+Inside of this hostgroup we put our local computer inside it which should mean; Ansible doesnt have to SSH anymore and run the commands directly since its a local computer, it skips the ssh step.
+
 
 ## BONUS QUESTION
 
@@ -153,3 +158,6 @@ In your Ansible working directory where the `ansible.cfg' is, run
 You should get a pager displaying all available configuration values. How does it differ
 from when you run the same command in your usual home directory?
 
+A: When I run it in the ansible.cfg folder I can clearly see "CONFIG_FILE() = /home/onur/ansible_home/ansible.cfg" line present in the dump which means i fetches
+my custom settings. Whilst it doesn't when Im outside that folder which should mean it runs on "default" settings/values then. This probably means you can have custom settings
+in each folder, for each project you're working on.

@@ -6,21 +6,21 @@
 
 REQUIRED_PLUGINS = %w(vagrant-libvirt)
 exit unless REQUIRED_PLUGINS.all? do |plugin|
-  Vagrant.has_plugin?(plugin) || (
-    puts "The #{plugin} plugin is required. Please install it with:"
-    puts "$ vagrant plugin install #{plugin}"
-    false
-  )
+Vagrant.has_plugin?(plugin) || (
+  puts "The #{plugin} plugin is required. Please install it with:"
+  puts "$ vagrant plugin install #{plugin}"
+  false
+)
 end
 
 system("
-    if [ #{ARGV[0]} = 'up' ]; then
-        echo 'Creating SSH deploy keys...'
-        [ -f deploy_key ] || ssh-keygen -t ed25519 -N \"\" -f deploy_key -C 'deploy key'
-    elif [ #{ARGV[0]} = 'destroy' ]; then
-        echo 'Removing SSH deploy keys...'
-        rm --verbose --force deploy_key deploy_key.pub
-    fi
+  if [ #{ARGV[0]} = 'up' ]; then
+      echo 'Creating SSH deploy keys...'
+      [ -f deploy_key ] || ssh-keygen -t ed25519 -N \"\" -f deploy_key -C 'deploy key'
+  elif [ #{ARGV[0]} = 'destroy' ]; then
+      echo 'Removing SSH deploy keys...'
+      rm --verbose --force deploy_key deploy_key.pub
+aaaa
 ")
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
@@ -28,11 +28,21 @@ system("
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
+# The most common configuration options are documented and commented below.
+# For a complete reference, please see the online documentation at
+# https://docs.vagrantup.com.
 
-  config.vm.provider :libvirt do |libvirt|
+
+#######################################################
+# Onurs hostmanager config
+# Host och Gäst
+config.hostmanager.enabled = true
+config.hostmanager.manage_host = true
+config.hostmanager.include_offline = true
+config.hostmanager.ignore_private_ip = false
+######################################################
+
+config.vm.provider :libvirt do |libvirt|
     libvirt.graphics_type = "none"
   end
 

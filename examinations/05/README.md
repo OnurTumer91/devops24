@@ -81,6 +81,9 @@ What does the output look like the first time you run this playbook?
 
 What does the output look like the second time you run this playbook?
 
+
+A: THe first run, The first task(copy) succesfully executed and printed to us a  JSON like data with keys (dest, owner, mode etc) The service task then restarted and ran. the seconD run there was nothing to copy since it already exists. (If we do this after question B) we also always get chaned=1,since the service restarts nginx hence the changed=1)
+
 # QUESTION B
 
 Even if we have copied the configuration to the right place, we still do not have a working https service
@@ -119,12 +122,20 @@ Again, these addresses are just examples, make sure you use the IP of the actual
 Note also that `curl` needs the `--insecure` option to establish a connection to a HTTPS server with
 a self signed certificate.
 
+A: We can add a task that does just that. name it "Restart nginx to load new cfg" to make it structured and clear. Then with ansible.builtin.service we use nginx and state: restarted. We add it last so it does all the config tasks before and then restarts it so its up to date with the latest.
+
+
+
 # QUESTION C
 
 What is the disadvantage of having a task that _always_ makes sure a service is restarted, even if there is
 no configuration change?
 
+A:  If you're doing this on thousands of webservers you probably get accumulated downtime which even could interrupt users currently processing or downloading something. Servers are often scheduled for server maintanance for a reason and often announced well in advance. As one of the earlier exams mentioned it also breaks the concept of "idempotency", the restarts arent really neccessary. changed=1 should only be in the logs if it actually changed something, not every time a playbook is run.
+
 # BONUS QUESTION
 
 There are at least two _other_ modules, in addition to the `ansible.builtin.service` module that can restart
 a `systemd` service with Ansible. Which modules are they?
+
+A: ansible.built.in.systemd_service which is almost the same as systemd service which interacts with systemd. Seems to be an older version of it also that doesnt seem to be supported(only community?) thats named community.general.systemd.

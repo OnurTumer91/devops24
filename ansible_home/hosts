@@ -1,0 +1,12 @@
+[all:vars]
+ansible_user=deploy
+ansible_ssh_private_key_file=/home/onur/devops24/lab_environment/deploy_key
+
+[db]
+dbserver ansible_host=192.168.121.34
+
+[web]
+webserver ansible_host=192.168.121.2
+
+#[controller]
+#skoldator ansible_connection=local

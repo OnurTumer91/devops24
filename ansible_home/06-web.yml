@@ -5,7 +5,7 @@
   tasks:
     - name: Copy https.conf file to nginx/conf.d/
       ansible.builtin.copy:
-        src: ~/devops24/examinations/05/files/https.conf
+        src: files/https.conf
         dest: /etc/nginx/conf.d/https.conf
         owner: root
         group: root

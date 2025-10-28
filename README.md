@@ -17,7 +17,7 @@ See https://vagrant-libvirt.github.io/vagrant-libvirt/ for more details.
 
 ### Debian/Ubuntu/Kali Linux
 
-On Debian/Ubuntu/Kali Linux, you can probably do
+On Debian/Ubuntu/Kali Linux, you can _probably_ do
 
     $ sudo apt install qemu-system-common vagrant
     $ sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager
@@ -57,6 +57,27 @@ Details of the output may differ between distributions, but the important thing 
     $ vagrant up
 
 This should give you two VM:s; 'webserver' and 'dbserver' which are now ready to be used as lab environment.
+
+#### Backing up and restoring the initial lab environment
+
+As soon as you have the initial lab environment up, you can make a backup snapshot of the initial state:
+
+    $ vagrant snapshot save default
+
+'default' is just a name and you can call it anything you like.
+
+As you're working with the VM's you can always restore them to the initial state by doing
+
+    $ vagrant snapshot restore default
+
+Of course, you can take snapshots of later states too, and restore them in much the same way,
+by naming the snapshots after timestamps or something like that.
+
+You can get a list of available snapshots with:
+
+    $ vagrant snapshot list
+
+Refer to the Vagrant manual for more details: https://developer.hashicorp.com/vagrant/docs
 
 ## Links and Resources for learning Ansible
 

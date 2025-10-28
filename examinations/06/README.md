@@ -119,6 +119,8 @@ HINTS:
   also set the correct SELinux security context type on the directory and files. The context in question
   in this case should be `httpd_sys_content_t` for the `/var/www/example.internal/html/` directory.
 
+A: Done!
+
 # QUESTION B
 
 To each of the tasks that change configuration files in the webserver, add a `register: [variable_name]`.
@@ -167,6 +169,8 @@ There are several ways to accomplish this, and there is no _best_ way to do this
 
 Is this a good way to handle these types of conditionals? What do you think?
 
+A: Yeah it is pretty straght forward and m,akes sure unneccessary restarts are avoided. This uses the ansible principle of "idempotent" as in we make it more efficient and only restart tasks that must restart. For the scale of this project it was pretty easy to use but I dont know what the industry standard is for such procedures.
+
 # BONUS QUESTION
 
 Imagine you had a playbook with hundreds of tasks to be done on several hosts, and each one of these tasks
@@ -177,3 +181,5 @@ would you like the flow to work?
 
 Describe in simple terms what your preferred task flow would look like, not necessarily implemented in
 Ansible, but in general terms.
+
+A: This ties together with my previous answer regarding what the industry stanard is for handeling conditions and restarts. If we have  a trigger for restart on every sub-task it would take some time but if we instead wait for all the configs and instead have a boolean like value as T/F for a reboot at the end we would only have to reboot once. Much like how windows update works, it downloads every sub-ptach/update, installs them and only then prompts the user for reboot. Not on every small driver/patch/update.

@@ -23,3 +23,5 @@ instead of as a plain text string in the playbook.
 When the [QUESTION A](#question-a) is solved, use `ansible-vault` to store the password in encrypted
 form, and make it possible to run the playbook as before, but with the password as an
 Ansible Vault secret instead.
+
+A: Password is stored in devops24/ansible_home/vars/vault.txt

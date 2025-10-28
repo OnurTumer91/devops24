@@ -31,3 +31,5 @@ to authenticate as root:
 
 # Documentation and Examples
 https://docs.ansible.com/ansible/latest/collections/community/mysql/index.html
+
+A: Done! From dbserver i can run and see that its up and running with the user we created via: sudo mysql -e 'SELECT User FROM mysql.user;'

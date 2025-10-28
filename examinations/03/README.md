@@ -120,10 +120,12 @@ Run the exact same playbook again and study the output. What is the difference?
 ## QUESTION A
 
 What does the `ansible.builtin.debug` module actually do?
+A: Types out variables as output for debugging so we see what's happening.
 
 ## QUESTION B
 
 What is the variable 'ansible_facts' and where does it come from?
+A: It is a collection of sysinfo that Ansible gathers from all hosts prior to running tasks.(OS,IP,Hostname,Hårdvaror etc)
 
 ## QUESTION C
 
@@ -134,6 +136,8 @@ How do we now remove the software we installed through the playbook above? Make 
 playbook remove the exact same software we previously installed. Call the created
 playbook `03-uninstall-software.yml`.
 
+A: We just cp site.yml to 03-uninstall-software.yml and change last argument from present to absent which will uninstall/revert whatever we just installed. And we run it the same way with ansible-playbook 03-uninstall-software.yml
+
 ## BONUS QUESTION
 
 What happens when you run `ansible-playbook` with different options?
@@ -143,6 +147,7 @@ Explain what each of these options do:
 * --check
 * --syntax-check
 
+A: The more -v we add the more information we get, in detail, too much detail. --check is like a git -fetch, it doesnt change anything but just does a raincheck, it gives us info on what would potentially happen. --syntax-check is what it sounds like, it checks the YAML structure without running anything.
 ## Study Material & Documentation
 
 * https://docs.ansible.com/ansible/latest/playbook_guide/playbooks.html#working-with-playbooks

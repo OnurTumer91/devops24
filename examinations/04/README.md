@@ -53,12 +53,16 @@ module.
 
 How can we make the web server start with an addition of just one line to the playbook above?
 
+A: We didnt epcify it should start right away.If we run -vvv we can see it says "ActiveState":"inactive" so it doesnt really start at any point, its just installed. We proabbly need to ad an active state such as "state: started" 
+
 # QUESTION B
 
 You make have noted that the `become: true` statement has moved from a specific task to the beginning
 of the playbook, and is on the same indentation level as `tasks:`.
 
 What does this accomplish?
+
+A: It determines if 1 task or every task inside one play will run as sudo/root. In our case we do not have to repeat become:true since we have it up in task level indentation.
 
 # QUESTION C
 
@@ -72,8 +76,12 @@ log in to the machine and make sure that there are no `nginx` processes running.
 
 Why did we change the order of the tasks in the `04-uninstall-webserver.yml` playbook?
 
+A: We want to make sure there are no conflicts so we have to stop and disable the service before attempting to remove/uninstall it.
+
 # BONUS QUESTION
 
 Consider the output from the tasks above, and what we were actually doing on the machine.
 
 What is a good naming convention for tasks? (What SHOULD we write in the `name:` field`?)
+
+A: We are installing and removing and perhaps other times updating things, so its important to have clear concise and coherent structure in the naming. So Install/Uninstall/Update as name and task as Ensure X is started/enabled | stopped/disabled. So other users easily can understand and take over projects smoothly.

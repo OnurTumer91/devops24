@@ -63,3 +63,13 @@ For inspiration and as an example of an advanced project using Ansible for this,
 https://github.com/ansible-lockdown/RHEL10-CIS. Do *NOT*, however, try to run this compliance check
 on your virtual (or physical) machines. It will likely have unintended consequences, and may render
 your operating system and/or virtual machine unreachable.
+
+A: I created my playbook 16-compliance-check.yml. I scan and save information about packages and services via
+```yaml
+- name: Get package facts
+      ansible.builtin.package_facts: 
+
+    - name: Get service facts
+      ansible.builtin.service_facts:
+```
+Checking if insecure packages such as ftp, tftp server, talk-server, rsh-server isnt installed, whilst making checks that some are installed such as openssh, sudo, firewalld(and running), chrony(time sync), tests to run id root to see if root user exists. 

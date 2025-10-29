@@ -50,4 +50,6 @@ servers:
 
 # Resources and Documentation
 
-https://firewalld.org/
+https://firewalld.org
+
+A: Very cool to see so much progress, the servers are shaping up and Im starting to feel like a doer. This time around I tried using handler in the config file directly instead of calling it externally. I installed http/https on the web and mysql on the dbserver. My reload handler will trigger as soon as a noteable change is made. Im also starting to make the playbooks a bit more clean and tidier than before.

@@ -1,0 +1,56 @@
+---
+
+- name: Ensure firewalld is installed and running
+  hosts: all
+  become: true
+  tasks:
+    - name: Install firewalld and python3-firewall
+      ansible.builtin.package:
+        name:
+          - firewalld
+          - python3-firewall
+        state: present
+
+    - name: Enable and start firewalld
+      ansible.builtin.service:
+        name: firewalld
+        enabled: true
+        state: started
+
+
+- name: Configure firewall on webserver(s)
+  hosts: web
+  become: true
+  tasks:
+    - name: Allow HTTP and HTTPS
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        zone: public
+        state: enabled
+        permanent: true
+      loop: [http, https]
+      notify: Reload firewalld
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
+
+
+- name: Configure firewall on database server(s)
+  hosts: db
+  become: true
+  tasks:
+    - name: Allow MySQL
+      ansible.posix.firewalld:
+        service: mysql
+        zone: public
+        state: enabled
+        permanent: true
+      notify: Reload firewalld
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
+

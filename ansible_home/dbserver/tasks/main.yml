@@ -1,30 +1,27 @@
 ---
-- name: Ensure MariaDB-server is installed
+- name: Ensure MariaDB-server and PyMySQL present
   ansible.builtin.package:
-    name: mariadb-server
+    name:
+      - mariadb-server
+      - python3-PyMySQL
     state: present
 
-- name: Ensure python3-PyMySQL is installed
-  ansible.builtin.package:
-    name: python3-PyMySQL
-    state: present
-
-- name: Ensure MariaDB service is enabled and started
+- name: Ensure mariadb enabled & started
   ansible.builtin.service:
     name: mariadb
     enabled: true
     state: started
 
-- name: Create database webappdb
+- name: Create database
   community.mysql.mysql_db:
     name: webappdb
     state: present
     login_unix_socket: /var/lib/mysql/mysql.sock
 
-- name: Create MariaDB user
+- name: Create DB user
   community.mysql.mysql_user:
     name: webappuser
-    password: '{{ webappdb_password }}'
+    password: '{{ webappdb_password }}'   # från vars/vault.yml
     priv: webappdb.*:ALL
     login_unix_socket: /var/lib/mysql/mysql.sock
 

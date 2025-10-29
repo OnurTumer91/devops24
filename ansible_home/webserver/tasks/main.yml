@@ -1,17 +1,46 @@
+#Webserver Tasks
 ---
 - name: Ensure nginx is installed
   ansible.builtin.package:
     name: nginx
     state: present
 
-- name: Copy nginx configuration from template
-  ansible.builtin.template:
-    src: templates/example.internal.conf.j2
-    dest: /etc/nginx/conf.d/example.internal.conf
+- name: Deploy https.conf
+  ansible.builtin.copy:
+    src: https.conf              # ligger i roles/webserver/files/
+    dest: /etc/nginx/conf.d/https.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload nginx
 
-- name: Ensure nginx is started and enabled
+- name: Deploy vhost template
+  ansible.builtin.template:
+    src: example.internal.conf.j2 # ligger i roles/webserver/templates/
+    dest: /etc/nginx/conf.d/example.internal.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload nginx
+
+- name: Ensure web root exists
+  ansible.builtin.file:
+    path: /var/www/example.internal/html
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install index.html
+  ansible.builtin.copy:
+    src: index.html              # roles/webserver/files/
+    dest: /var/www/example.internal/html/index.html
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Ensure nginx started & enabled
   ansible.builtin.service:
     name: nginx
     state: started
     enabled: true
-

@@ -1,0 +1,28 @@
+---
+- name: Create users / append groups
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Ensure neccesary groups exist
+      ansible.builtin.group:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - wheel
+        - video
+        - audio
+        - tape
+        - tcpdump
+
+    - name: Ensure users exist with specific groups combo
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        state: present
+        groups: "{{ item.groups }}"
+        append: true
+      loop:
+        - { name: "alovelace", groups: "wheel,video,audio" }
+        - { name: "aturing",   groups: "tape" }
+        - { name: "edijkstra", groups: "tcpdump" }
+        - { name: "ghopper",   groups: "wheel,audio" }

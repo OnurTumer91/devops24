@@ -38,6 +38,25 @@ When your playbook is run, one should be able to do this on the webserver:
 
 There are multiple ways to accomplish this, but keep in mind _idempotency_ and _maintainability_.
 
+A: 
+```yaml
+- name: Create user accounts
+  hosts: web
+  become: true
+  tasks:
+    - name: Ensure users exist with correct groups
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        append: true
+        state: present
+      loop:
+        - { name: "alovelace", groups: "wheel,video,audio" }
+        - { name: "aturing", groups: "tape" }
+        - { name: "edijkstra", groups: "tcpdump" }
+        - { name: "ghopper", groups: "wheel,audio" }
+```
+
 # QUESTION B
 
 Write a playbook that uses
@@ -49,6 +68,26 @@ to copy all `\*.md` files in the `files/` directory to the `deploy` user's direc
 For now you can create empty files in the `files/` directory called anything as long as the suffix is `.md`:
 
     $ touch files/foo.md files/bar.md files/baz.md
+
+A: 
+
+```yaml
+- name: Create user accounts
+  hosts: web
+  become: true
+  tasks:
+    - name: Ensure users exist with correct groups
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        groups: "{{ item.groups }}"
+        append: true
+        state: present
+      loop:
+        - { name: "alovelace", groups: "wheel,video,audio" }
+        - { name: "aturing", groups: "tape" }
+        - { name: "edijkstra", groups: "tcpdump" }
+        - { name: "ghopper", groups: "wheel,audio" }
+```
 
 # BONUS QUESTION
 

@@ -1,0 +1,51 @@
+---
+- name: Configure prometheus on your local machine
+  hosts: localhost
+  connection: ansible.builtin.local
+
+  vars:
+    prometheus_config:
+      scrape_configs:
+        - job_name: 'prometheus'
+          scrape_interval: 5s
+          static_configs:
+            - targets: ['localhost:9090']
+        - job_name: 'node'
+          static_configs:
+            - targets:
+                - 'node-exporter:9100'
+                - '192.168.121.2:9100'
+                - '192.168.121.34:9100'
+          relabel_configs:
+            - source_labels: [__address__]
+              regex: 'node-exporter:9100'
+              target_label: instance
+              replacement: 'controller'
+
+  tasks:
+    - name: Ensure podman is installed
+      ansible.builtin.package:
+        name: podman
+        state: present
+    - name: Write Prometheus config
+      ansible.builtin.copy:
+        content: "{{ prometheus_config }}"
+        dest: /tmp/scrape-config.yml
+        mode: "0644"
+
+    - name: Ensure Prometheus container is running
+      containers.podman.podman_container:
+        name: prometheus
+        image: quay.io/prometheus/prometheus:latest
+        pod: new:prometheus
+        volumes:
+          - "/tmp/scrape-config.yml:/etc/prometheus/prometheus.yml"
+          - "prometheus_data:/data"
+        ports:
+          - "9090:9090"
+
+    - name: Ensure Node Exporter container is running
+      containers.podman.podman_container:
+        name: node-exporter
+        image: quay.io/prometheus/node-exporter:latest
+        pod: prometheus

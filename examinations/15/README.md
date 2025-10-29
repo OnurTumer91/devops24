@@ -51,3 +51,73 @@ will get you on the right track, for instance if you've changed any of the Prome
 
 * https://github.com/prometheus/node_exporter/tree/master/examples/systemd
 * https://prometheus.io/docs/guides/node-exporter/
+*
+A: First I got Podman; ansible-galaxy collection install containers.podman. I added it at the beginning of Prometheus.yml
+```yaml
+- name: Ensure podman is installed
+  ansible.builtin.package:
+    name: podman
+    state: present
+```
+So no we have Podman installed, its initiated by Prometheus.yml. I created my 15-node_exporter.yml
+```yaml
+---
+- name: Install and enable Node Exporter
+  hosts: all
+  become: true
+  tasks:
+    - name: Create node_exporter user
+      ansible.builtin.user:
+        name: node_exporter
+        system: true
+        shell: /usr/sbin/nologin
+        create_home: false
+
+    - name: Download node_exporter
+      ansible.builtin.get_url:
+        url: https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz
+        dest: /tmp/node_exporter.tar.gz
+
+    - name: Extract node_exporter binary
+      ansible.builtin.unarchive:
+        src: /tmp/node_exporter.tar.gz
+        dest: /usr/local/bin/
+        remote_src: true
+        extra_opts: [--strip-components=1]
+
+    - name: Create systemd service file
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/node_exporter.service
+        content: |
+          [Unit]
+          Description=Node Exporter
+          After=network.target
+
+          [Service]
+          User=node_exporter
+          ExecStart=/usr/local/bin/node_exporter
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+        mode: "0644"
+
+    - name: Enable and start Node Exporter service
+      ansible.builtin.systemd:
+        name: node_exporter
+        enabled: true
+        state: started
+
+    - name: Open Node Exporter port 9100/tcp in firewalld
+      ansible.posix.firewalld:
+        port: 9100/tcp
+        permanent: true
+        immediate: true
+        state: enabled
+
+```
+We create user node_exporter, install node exporter, create and run the systemd-service, make sure it start at boot, öpen port 9100. Also lifehack; use [--strip-components=1] to take away one level of extraction folder. F.eg extracts testfile123.zip directly into /temp/testfile.yml instead of temp/testfile123/testfile123.yml.
+
+Then we can confirm its runnign by: ansible all -m shell -a "systemctl status node_exporter | grep Active".
+
+I had to stop and rerun podman to see it popping up correctly. If I run sudo podman ps --pod I can clearly see my 3 containers. Prometheus the main server running on port 9090, node-exporter gathering the data running on port 9100 inside the pod, podman-pause managing the connection between containers. I can confirm it working via the browser on localhost:9090.

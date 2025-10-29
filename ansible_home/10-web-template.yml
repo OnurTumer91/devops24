@@ -1,0 +1,45 @@
+---
+- name: Configure nginx using template
+  hosts: web
+  become: true
+  tasks:
+    - name: Copy https.conf file to nginx/conf.d/
+      ansible.builtin.copy:
+        src: files/https.conf
+        dest: /etc/nginx/conf.d/https.conf
+        owner: root
+        group: root
+        mode: '0644'
+      register: https_result
+
+    - name: Apply example.internal nginx template
+      ansible.builtin.template:
+        src: templates/example.internal.conf.j2
+        dest: /etc/nginx/conf.d/example.internal.conf
+        owner: root
+        group: root
+        mode: '0644'
+      register: vhost_result
+
+    - name: Ensure directory for example.internal exists
+      ansible.builtin.file:
+        path: /var/www/example.internal/html
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Upload index.html for example.internal
+      ansible.builtin.copy:
+        src: files/index.html
+        dest: /var/www/example.internal/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart nginx to load new config (only if changed)
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+      when: https_result.changed or vhost_result.changed
+

@@ -33,3 +33,29 @@ Use the `ansible.builtin.template` module to accomplish this task.
 * https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html
 * https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html
 * https://nginx.org/en/docs/http/ngx_http_core_module.html#listen
+*
+*
+* A: Tried my best to check the docs I eventually ended up with:
+*
+* ```yaml
+*server {
+    listen {{ ansible_default_ipv4.address }}:80;
+    listen {{ ansible_default_ipv4.address }}:443 ssl;
+
+    root /var/www/example.internal/html;
+    index index.html;
+    server_name example.internal;
+
+    ssl_certificate "/etc/pki/nginx/server.crt";
+    ssl_certificate_key "/etc/pki/nginx/private/server.key";
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  10m;
+    ssl_ciphers PROFILE=SYSTEM;
+    ssl_prefer_server_ciphers on;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+* ```
+*With 06-web i just changed the copy. After running the playbook i tried to curl example.internal and it fetched the html cirrectly! ( curl --insecure https://example.internal )

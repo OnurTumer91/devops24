@@ -36,3 +36,61 @@ provided instead.
 To be able to use the password when running the playbooks later, you must use the `--ask-become-pass`
 option to `ansible` and `ansible-playbook` to provide the password. You can also place the password
 in a file, like with `ansible-vault`, or have it encrypted via `ansible-vault`.
+
+
+A: Created my hash. Used the password hash in vars as variable, i had to change the " to ' which I think caused an error on my first run. "{{deploy_password_hash}}" into '{{deploy_password_hash}}' and then we simply enforce that sudo has to enter pass.
+
+This didnt work of course since I had some slacking files in etc/sudoers.d/deploy in which I have stated passwordless use. To clean those up I did a playbook
+```yaml
+---
+- name: Clean up old passwordless sudo rules
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Disable old cloud-init sudo rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/90-cloud-init-users
+        state: absent
+
+    - name: Disable old deploy sudo rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/deploy
+        state: absent
+
+    - name: Ensure secure sudo rule is in place
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/99-deploy
+        owner: root
+        group: root
+        mode: '0440'
+        content: |
+          deploy ALL=(ALL) ALL
+        validate: 'visudo -cf %s'
+```
+This safely removes the two files I had which was causing some conflicts. I also did a Vagrant snapshot before just in case.
+
+I also did a playbook for fun that would revert the deploy, just so I dont have to play around with vagrant snapshots.
+```yaml
+---
+- name: Revert to passwordless sudo for deploy
+  hosts: all
+  become: true
+  gather_facts: false
+
+  tasks:
+    - name: Restore passwordless sudo rule for deploy
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/deploy
+        owner: root
+        group: root
+        mode: '0440'
+        content: |
+          %deploy ALL=(ALL) NOPASSWD: ALL
+        validate: 'visudo -cf %s'
+```
+
+So now I can clean any existing deploy password rules, execute my ensure sudo playbook and if i want revert back to passwordless with revert_nopassword playbook.
+
+

@@ -1,0 +1,27 @@
+---
+- name: Require sudo password for deploy
+  hosts: all
+  become: true
+  gather_facts: false
+
+  vars:
+    # `openssl passwd -6 hunter12`
+    deploy_pass_hash: "$6$P8YWxliHrc/skvvl$qhio1nPnZSRvaptgpl5S1lxPTL5Lxwbu.PeUfqohHp6rmmIQAkSJxy5rCLSt9ANFAVDvL/dl/sSR8z39z2mdl."
+
+  tasks:
+    - name: Ensure deploy has a login password.
+      ansible.builtin.user:
+        name: deploy
+        password: "{{ deploy_pass_hash }}"
+        update_password: always
+
+    - name: Ensure sudo command requires a password for deploy
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers.d/99-deploy
+        create: yes
+        line: 'deploy ALL=(ALL) ALL'
+        state: present
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'

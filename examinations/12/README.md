@@ -41,3 +41,60 @@ HINT: You can use
 
 to create a skeleton for a role. You won't need ALL the directories created by this,
 but it gives you a starting point to fill out in case you don't want to start from scratch.
+
+
+A: I added my vars file in to the 12-roles.yml that was the only issue I was having repeadetly, but when I added it that was solved. I also added become:true since its needed to modify/install packages.
+
+As for roles I gave webserver exam 4-6, and dbserver exam 7-9. Essentially this:
+roles/dbserver/tasks/main.yml
+```yaml
+---
+- name: Ensure MariaDB-server is installed
+  ansible.builtin.package:
+    name: mariadb-server
+    state: present
+
+- name: Ensure python3-PyMySQL is installed
+  ansible.builtin.package:
+    name: python3-PyMySQL
+    state: present
+
+- name: Ensure MariaDB service is enabled and started
+  ansible.builtin.service:
+    name: mariadb
+    enabled: true
+    state: started
+
+- name: Create database webappdb
+  community.mysql.mysql_db:
+    name: webappdb
+    state: present
+    login_unix_socket: /var/lib/mysql/mysql.sock
+
+- name: Create MariaDB user
+  community.mysql.mysql_user:
+    name: webappuser
+    password: "{{ webappdb_password }}"
+    priv: webappdb.*:ALL
+    login_unix_socket: /var/lib/mysql/mysql.sock
+```
+
+and the webserver:
+```yaml
+---
+- name: Ensure nginx is installed
+  ansible.builtin.package:
+    name: nginx
+    state: present
+
+- name: Copy nginx configuration from template
+  ansible.builtin.template:
+    src: templates/example.internal.conf.j2
+    dest: /etc/nginx/conf.d/example.internal.conf
+
+- name: Ensure nginx is started and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+```

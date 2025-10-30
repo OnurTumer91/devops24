@@ -4,9 +4,11 @@ ansible_ssh_private_key_file=/home/onur/devops24/lab_environment/deploy_key
 
 [db]
 dbserver ansible_host=192.168.121.34
+#dbserver ansible_host=192.168.121.220
 
 [web]
 webserver ansible_host=192.168.121.2
+#webserver ansible_host=192.168.121.140
 
 #[controller]
 #skoldator ansible_connection=local

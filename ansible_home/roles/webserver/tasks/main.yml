@@ -72,3 +72,16 @@
     name: nginx
     state: started
     enabled: true
+
+- name: Ensure users exist with correct groups
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    append: true
+    state: present
+  loop:
+    - { name: "alovelace", groups: "wheel,video,audio" }
+    - { name: "aturing", groups: "tape" }
+    - { name: "edijkstra", groups: "tcpdump" }
+    - { name: "ghopper", groups: "wheel,audio" }
+

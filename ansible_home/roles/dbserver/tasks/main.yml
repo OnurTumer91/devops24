@@ -25,3 +25,12 @@
     priv: webappdb.*:ALL
     login_unix_socket: /var/lib/mysql/mysql.sock
 
+- name: Copy all local *.md files to /home/deploy/
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /home/deploy/
+    owner: deploy
+    group: deploy
+    mode: '0644'
+  with_fileglob:
+    - "files/*.md"

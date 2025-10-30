@@ -25,44 +25,21 @@ a full `restart`.
 A: Most essential difference is I added "notify: reload nginx" which will trigger the handler file and trigger the reload to each task that should require it. No longer using "when:". This feels much more inutiative and less destructive. I also combined tasks such as Mariadb & PyMySQL state checks into 1 task. I also added minor stuff I thought was missing. HEre is the latest:
 
 ```yaml
-and the webserver:
+- name: Deploy https.conf
+  ansible.builtin.copy:
+    src: https.conf
+    dest: /etc/nginx/conf.d/https.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
 
----
-- name: Ensure nginx is installed
-  ansible.builtin.package:
-    name: nginx
-    state: present
-
-- name: Copy nginx configuration from template
+- name: Deploy vhost template
   ansible.builtin.template:
-    src: templates/example.internal.conf.j2
+    src: example.internal.conf.j2
     dest: /etc/nginx/conf.d/example.internal.conf
-
-- name: Ensure nginx is started and enabled
-  ansible.builtin.service:
-    name: nginx
-    state: started
-    enabled: true
-```
-
-and dbserver:
-```yaml
-and the webserver:
-
----
-- name: Ensure nginx is installed
-  ansible.builtin.package:
-    name: nginx
-    state: present
-
-- name: Copy nginx configuration from template
-  ansible.builtin.template:
-    src: templates/example.internal.conf.j2
-    dest: /etc/nginx/conf.d/example.internal.conf
-
-- name: Ensure nginx is started and enabled
-  ansible.builtin.service:
-    name: nginx
-    state: started
-    enabled: true
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload nginx
 ```
